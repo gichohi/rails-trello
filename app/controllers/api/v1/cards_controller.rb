@@ -6,22 +6,33 @@ class Api::V1::CardsController < ApplicationController
 
   def create
     card = Card.create(card_params)
-        if @customer.valid?
-          render json: card, status: :created
-        else
-          render json: {'code': 205, 'message': 'Record cannot be created'}, status: :unprocessable_entity
-        end
+    if card.valid?
+      render json: card, status: :created
+    else
+      render json: { 'code': 205, 'message': 'Record cannot be created' }, status: :unprocessable_entity
+    end
   end
 
   def show
+    if card
+      render json: card
+    else
+      render json: card.errors
+    end
   end
 
   def destroy
+    card&.destroy
+    render json: { message: 'Card Deleted'}
   end
 
   private
 
-      def card_params
-        params.permit(:id, :name, :idList)
-      end
+  def card_params
+    params.permit(:id, :name, :idCard)
+  end
+
+  def card
+    @card ||= Card.find(params[:id])
+  end
 end
